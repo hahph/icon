@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operations Intelligence System — Portfolio Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0d0d0d;
+    --ink-soft: #3a3a3a;
+    --ink-muted: #888;
+    --paper: #f5f2ec;
+    --paper-warm: #ede9e0;
+    --paper-gray: #d5d1cb;
+    --accent: #c8401a;
+    --accent-pale: #f0d5cc;
+    --rule: #d4cfc6;
+    --teal: #7d5f00;
+    --gold: #bb9600;
+    --blue: #1a4a8a;
+    --purple: #94215f;
+    --nav-h: 54px;
+  }
+
+  html { scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; line-height: 1.6; overflow-x: hidden;
+  }
+
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999; opacity: 0.6;
+  }
+
+  #progress {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); width: 0%; z-index: 1001;
+    transition: width 0.1s linear;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 3.5rem; height: var(--nav-h);
+    background: rgba(245,242,236,0.93); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--rule); z-index: 100;
+  }
+  .nav-left { display: flex; align-items: center; }
+  .nav-back {
+    font-family: 'DM Mono', monospace; font-size: 0.63rem; letter-spacing: 0.1em;
+    text-transform: uppercase; text-decoration: none; color: var(--ink-muted);
+    display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;
+    border-right: 1px solid var(--rule); padding-right: 1.8rem; margin-right: 1.8rem;
+    height: var(--nav-h);
+  }
+  .nav-back:hover { color: var(--accent); }
+  .nav-back:hover .nav-back-arrow { transform: translateX(-3px); }
+  .nav-back-arrow { font-size: 1.05rem; display: inline-block; transition: transform 0.2s; }
+  /* nav-logo is now a clickable link back to hero */
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300;
+    letter-spacing: 0.06em; color: var(--ink-soft);
+    text-decoration: none; cursor: pointer; transition: color 0.2s;
+  }
+  .nav-logo:hover { color: var(--accent); }
+  .nav-links { display: flex; list-style: none; }
+  .nav-links li { position: relative; }
+  .nav-links li + li::before {
+    content: ''; position: absolute; left: 0; top: 50%;
+    transform: translateY(-50%); height: 12px; width: 1px; background: var(--rule);
+  }
+  .nav-links a {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.05em;
+    text-transform: uppercase; text-decoration: none; color: var(--ink-muted);
+    transition: color 0.2s; display: flex; align-items: center; gap: 0.35rem;
+    padding: 0 1.1rem; height: var(--nav-h);
+  }
+  .nav-step { font-size: 0.75rem; opacity: 0.55; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+  .nav-links a.active .nav-step { opacity: 1; }
+
+  /* ── SNAP BASE ── */
+  .snap-section {
+    scroll-snap-align: start; scroll-snap-stop: always;
+    height: 100vh; overflow: hidden;
+    padding-top: var(--nav-h);
+    display: flex; flex-direction: column;
+  }
+  .sec-inner {
+    width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 3.5rem;
+    flex: 1; display: flex; flex-direction: column; min-height: 0;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; gap: 1.2rem;
+    padding: 1.2rem 0 1rem; border-bottom: 1px solid var(--rule); flex-shrink: 0;
+  }
+  .section-number {
+    font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 500;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-muted);
+    padding: 0.3rem 0.55rem; border: 1px solid var(--rule); line-height: 1; flex-shrink: 0;
+  }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.95rem; font-weight: 300; color: var(--ink); line-height: 1.1; }
+  .section-title em { font-style: italic; color: var(--accent); }
+
+  /* ── HERO ── */
+  .hero-section {
+    scroll-snap-align: start; scroll-snap-stop: always;
+    height: 100vh; overflow: hidden;
+    display: grid; grid-template-columns: 1fr 1fr; padding-top: var(--nav-h);
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 3rem 2.8rem 3rem 3.5rem; border-right: 1px solid var(--rule);
+  }
+  .hero-tag {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 3rem;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+  .hero-tag::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--accent); }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(38px,4.4vw,64px);
+    font-weight: 300; line-height: 1.07; letter-spacing: -0.02em; margin-bottom: 2rem;
+  }
+  .hero-title em { font-style: italic; color: var(--accent); font-weight: 300; }
+  .hero-subtitle { font-size: 0.855rem; color: var(--ink-soft); line-height: 1.75; max-width: 44ch; }
+  .hero-right {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 3rem 3.5rem 3rem 2.8rem; gap: 1.8rem; background: var(--paper-warm);
+  }
+  .hero-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .hero-stat {
+    background: var(--paper); padding: 1.2rem 1.4rem;
+    position: relative; overflow: hidden; transition: background 0.3s; cursor: default;
+  }
+  .hero-stat:hover { background: var(--paper-warm); }
+  .hero-stat::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px; background: var(--accent); transition: width 0.4s ease;
+  }
+  .hero-stat:hover::after { width: 100%; }
+  .stat-number { font-family: 'Instrument Sans', sans-serif; font-size: 2rem; font-weight: 600; color: #434343; line-height: 1; margin-bottom: 0.5rem; }
+  .stat-number sup { font-size: 1.1rem; color: var(--accent); vertical-align: super; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-muted); line-height: 1.4; }
+  .tags-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 0.57rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.7rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .tags-eyebrow::before { content: ''; width: 1.5rem; height: 1px; background: var(--ink-muted); flex-shrink: 0; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 0.57rem; letter-spacing: 0.09em; text-transform: uppercase; padding: 0.32rem 0.75rem; white-space: nowrap; }
+  .tag-dark   { background: var(--ink); color: var(--paper); }
+  .tag-accent { background: var(--accent); color: #fff; }
+  .tag-teal   { background: var(--teal); color: #fff; }
+  .tag-blue   { background: var(--blue); color: #fff; }
+
+  /* ── CHALLENGES ── */
+  .challenges-section { background: var(--ink); }
+  .challenges-section .section-title { color: #f0ece4; }
+  .challenges-section .section-number { color: #555; border-color: #2e2e2e; }
+  .challenges-section .section-header { border-color: #222; }
+  .challenges-lead { font-size: 0.81rem; color: #777; line-height: 1.7; padding: 2rem 0; flex-shrink: 0; }
+  .challenge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1e1e1e; }
+  .challenge-card { background: #111; padding: 1.5rem 1.7rem; display: flex; flex-direction: column; transition: background 0.3s; }
+  .challenge-card:hover { background: #161616; }
+  .challenge-tag {
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.55rem;
+  }
+  .challenge-tag::before { content: ''; width: 1rem; height: 1px; background: var(--accent); }
+  .challenge-title { font-family: 'Cormorant Garamond', serif; font-size: 1.18rem; font-weight: 400; color: #f0ece4; margin-bottom: 0.55rem; line-height: 1.25; }
+  .challenge-body { font-size: 0.78rem; color: #777; line-height: 1.6; flex: 1; }
+  .challenge-risk { margin-top: 0.8rem; padding: 0.5rem 0.85rem; background: rgba(200,64,26,0.1); border-left: 2px solid var(--accent); }
+  .challenge-risk p { font-size: 0.73rem; color: #c09080; font-style: italic; }
+
+  /* ── MY ROLE ── */
+  .role-section { background: var(--paper-warm); }
+  .role-intro-block { display: flex; align-items: center; gap: 2.5rem; padding: 2rem 0; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+  .role-intro-text { flex: 1 1 100%; }
+  .role-intro-text p { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.6; }
+  .resp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); grid-auto-rows: minmax(200px,auto); min-height: 0; }
+  .responsibility { background: var(--paper); padding: 1.3rem 1.5rem; display: flex; flex-direction: column; transition: background 0.2s; }
+  .responsibility:hover { background: #fff; }
+  .resp-meta {
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--ink-muted);
+    letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.65rem;
+    padding-bottom: 0.7rem; border-bottom: 1px solid var(--rule);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .resp-num { color: var(--accent); }
+  .resp-content h4 { font-size: 0.88rem; font-weight: 600; color: var(--ink); margin-bottom: 0.35rem; line-height: 1.3; }
+  .resp-content p { font-size: 0.77rem; color: var(--ink-soft); line-height: 1.55; }
+
+  /* ── SOLUTION ── */
+  .solution-section { background: var(--paper); }
+  .system-lead { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.72; padding: 0.9rem 0; flex-shrink: 0; }
+  .arch-diagram-wrap { border: 1px solid var(--rule); background: #fff; overflow: hidden; max-height: 530px; min-height: 0; display: flex; flex-direction: column; }
+  
+   .arch-meta {
+    width: 265px; flex-shrink: 0;
+    padding: 2rem 2rem;
+    background: var(--paper-warm);
+    border-right: 1px solid var(--rule);
+    display: flex; flex-direction: column; justify-content: center; gap: 0.9rem;
+  }
+  
+  .arch-diagram-img { width: 100%; flex: 1; object-fit: contain; display: block; min-height: 0; }
+  .arch-diagram-fallback { display: none; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; flex: 1; background: var(--paper-warm); padding: 2rem; }
+  .arch-fallback-label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-muted); }
+  .arch-fallback-sub { font-size: 0.78rem; color: var(--ink-muted); text-align: center; }
+  .arch-fallback-sub code { font-family: 'DM Mono', monospace; color: var(--accent); }
+  
+  .arch-diagram-caption { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: var(--ink); line-height: 1.2;
+  }
+  .arch-legend-item-a { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.65; }
+  .arch-legend-item-b { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.65; }
+  .arch-legend-item-b::after {
+  content: '';
+  display: block;
+  width: 14px;  height: 16px;  
+  margin: 0.75rem auto 0;
+  background: var(--accent);
+  clip-path: polygon(50% 100%, 0 40%, 20% 40%, 20% 0, 80% 0, 80% 40%, 100% 40%);
+}
+
+  /* ── THE SYSTEM ── */
+  .system-section { background: var(--paper-warm); }
+
+  .sys-slider {
+    border: 1px solid var(--rule); overflow: hidden;
+    flex: 0 1 530px; min-height: 0; display: flex; flex-direction: column;
+  }
+  .sys-track-wrap { overflow: hidden; flex: 1; min-height: 0; }
+  .sys-track {
+    display: flex; height: 100%;
+    transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Each slide: left panel (meta) + right panel (visual) side-by-side */
+  .sys-slide {
+    min-width: 100%; height: 100%;
+    display: flex; flex-direction: row;
+  }
+
+  /* Left: title + description */
+  .sys-slide-meta {
+    width: 265px; flex-shrink: 0;
+    padding: 2rem 2rem;
+    background: var(--paper-warm);
+    border-right: 1px solid var(--rule);
+    display: flex; flex-direction: column; justify-content: center; gap: 0.9rem;
+  }
+  .sys-slide-label {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-muted);
+  }
+  .sys-slide-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600;
+    color: var(--ink); line-height: 1.2;
+  }
+  /* Accent rule below title */
+  .sys-slide-title::after {
+    content: ''; display: block;
+    width: 2rem; height: 2px; background: var(--accent);
+    margin-top: 0.65rem;
+  }
+  .sys-slide-desc { font-size: 0.76rem; color: var(--ink-soft); line-height: 1.65; }
+
+  /* Right: image area with padding for breathing room */
+  .sys-slide-visual {
+    flex: 1; min-width: 0;
+    padding: 1.2rem;
+    background: var(--paper-gray);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .sys-slide-visual img {
+    max-width: 100%; max-height: 100%;
+    width: auto; height: auto;
+    object-fit: contain;
+    display: block;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+  }
+  .sys-placeholder {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 0.7rem;
+    width: 100%; height: 100%;
+    border: 1px dashed var(--rule);
+  }
+  .sys-placeholder svg { width: 32px; height: 32px; opacity: 0.18; }
+  .sys-placeholder span {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-muted); opacity: 0.5; text-align: center;
+  }
+
+  .sys-controls {
+    display: flex; align-items: center; justify-content: flex-start;  gap: 460px;
+    padding: 0.35rem 6rem; background: var(--ink); flex-shrink: 0;
+  }
+  .sys-dots { display: flex; gap: 5px; align-items: center; }
+  .sys-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.18); border: none; cursor: pointer; padding: 0; transition: all 0.25s; }
+  .sys-dot.active { background: var(--accent); width: 18px; border-radius: 3px; }
+  .sys-nav { display: flex; gap: 5px; align-items: center; }
+  .sys-counter { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); margin-right: 0.6rem; }
+  .sys-btn { width: 26px; height: 26px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12); color: var(--paper); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 15px; }
+  .sys-btn:hover { background: var(--accent); border-color: var(--accent); }
+  .sys-btn:disabled { opacity: 0.2; cursor: default; }
+
+  /* ── IMPACT ── */
+  .results-section { background: var(--paper); }
+  .results-lead { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.75; padding: 0.9rem 0; max-width: 97ch; flex-shrink: 0; }
+  .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .result-card { background: var(--paper); padding: 1.5rem 1.6rem; position: relative; overflow: hidden; transition: background 0.3s; display: flex; flex-direction: column; }
+  .result-card:hover { background: var(--paper-warm); }
+  .result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .result-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px; background: var(--blue); transition: width 0.4s ease;
+  }
+  .result-card:hover::after { width: 100%; }
+  
+
+  .result-cat { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.75rem; }
+  .result-card.op .result-cat { color: var(--purple); }
+  .result-card.wo .result-cat { color: var(--blue); }
+  .result-card.ac .result-cat { color: var(--gold); }
+  .result-card.fi .result-cat { color: var(--accent); }
+  .result-title { font-family: 'Cormorant Garamond', serif; font-size: 1.18rem; font-weight: 300; color: var(--ink); line-height: 1.25; margin-bottom: 0.65rem; }
+  .result-body { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.6; flex: 1; }
+  
+  .cta-box {
+    border: 1px solid var(--rule); border-top: none; background: var(--paper-warm);
+    padding: 2rem 3rem; display: flex; align-items: center; justify-content: space-between;
+    gap: 2rem; flex-shrink: 0; margin-top: 1.2rem;
+  }
+  .cta-headline { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 300; line-height: 0.9; color: var(--ink); margin-bottom: 0.15rem; }
+  .cta-headline em { font-style: italic; color: var(--accent); }
+  .cta-sub { font-size: 0.8rem; color: var(--ink-soft); }
+  .cta-btn { display: inline-flex; align-items: center; gap: 0.55rem; background: var(--accent); color: #fff; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; padding: 0.65rem 1.4rem; border: 1px solid var(--accent); transition: background 0.25s, border-color 0.25s; white-space: nowrap; flex-shrink: 0; }
+  .cta-btn:hover { background: var(--ink); border-color: var(--ink); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); padding: 0.8rem 1.5rem;
+    display: flex; justify-content: center; align-items: center;
+    border-top: 0px solid #1e1e1e; flex-shrink: 0;
+  }
+  .footer-text { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #6b6b6b; letter-spacing: 0.09em; }
+
+  /* ──────────────────────────────────────────
+     REVEAL ANIMATION
+     Strategy: content is fully visible by default.
+     JS adds .anim-ready to <body> ONLY after fonts
+     have loaded (or 300ms timeout), which enables
+     the transition. This way file:// never shows
+     blank content even if JS/observer fails.
+  ────────────────────────────────────────── */
+  .reveal { opacity: 1; transform: none; }
+
+  body.anim-ready .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  body.anim-ready .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+  .d1 { transition-delay: 0.07s; }
+  .d2 { transition-delay: 0.14s; }
+  .d3 { transition-delay: 0.21s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    nav, .sec-inner { padding-left: 2rem; padding-right: 2rem; }
+    .hero-left { padding: 2.5rem 2rem 2.5rem 2rem; }
+    .hero-right { padding: 2.5rem 2rem; }
+    .sys-slide-meta { width: 240px; }
+  }
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+    .hero-section { grid-template-columns: 1fr; height: auto; }
+    .challenge-grid, .results-grid, .resp-grid { grid-template-columns: 1fr; }
+    .snap-section { height: auto; min-height: 100vh; }
+    .sys-slide { flex-direction: column; }
+    .sys-slide-meta { width: 100%; border-right: none; border-bottom: 1px solid var(--rule); }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="#" class="nav-back"><span class="nav-back-arrow">&#8678;</span> Portfolio</a>
+    <a href="#hero" class="nav-logo" id="navLogo">Case Study — FinEdu Operations </a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#challenges"><span class="nav-step">01/</span> Business Challenges</a></li>
+    <li><a href="#role"><span class="nav-step">02/</span> My Role</a></li>
+    <li><a href="#solution"><span class="nav-step">03/</span> Solution</a></li>
+    <li><a href="#system"><span class="nav-step">04/</span> The System</a></li>
+    <li><a href="#results"><span class="nav-step">05/</span> Impact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section" id="hero">
+  <div class="hero-left reveal">
+    <p class="hero-tag">The Project · Overview</p>
+    <h1 class="hero-title">Building an <em>Integrated</em><br>Operations System</h1>
+    <p class="hero-subtitle">Designed and deployed a governance framework from the ground up — connecting academic quality control, branch operations, and financial transparency across an +10-location education network with ~100 teaching staff.</p>
+  </div>
+  <div class="hero-right">
+    <div class="hero-stat-grid">
+      <div class="hero-stat reveal"><div class="stat-number">11</div><div class="stat-label">Branches &<br>B2B School Sites</div></div>
+      <div class="hero-stat reveal d1"><div class="stat-number">100<sup>+</sup></div><div class="stat-label">Teaching Staff<br>Covered</div></div>
+      <div class="hero-stat reveal d2"><div class="stat-number">3</div><div class="stat-label">Governance Pillars<br>Unified</div></div>
+      <div class="hero-stat reveal d3"><div class="stat-number">1</div><div class="stat-label">Platform<br>Google Workspace</div></div>
+    </div>
+    <div class="reveal">
+      <p class="tags-eyebrow">Capabilities demonstrated</p>
+      <div class="tag-row">
+        <span class="tag tag-accent">Financial Operations</span>
+        <span class="tag tag-teal">B2B &amp; B2C Operations</span>
+        <span class="tag tag-blue">Data Architecture</span>
+        <span class="tag tag-dark">Operational Governance</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGES -->
+<section class="snap-section challenges-section" id="challenges">
+  <div class="sec-inner">
+    <div class="section-header reveal">
+      <span class="section-number">01</span>
+      <h2 class="section-title">Business <em>Challenges</em></h2>
+    </div>
+    <p class="challenges-lead reveal">A decade of organic growth had outpaced the organization's internal governance capacity. As the B2B segment scaled alongside existing B2C branches, <br>four structural risks converged — each compounding the others in ways leadership could no longer resolve reactively.</p>
+    <div class="challenge-grid reveal">
+      <div class="challenge-card">
+        <p class="challenge-tag">Scalability Risk</p>
+        <h3 class="challenge-title">No System. No Visibility. No Control.</h3>
+        <p class="challenge-body">Data lived in Zalo groups, Excel files, and the memory of individual managers. There was no centralized mechanism to collect, synthesize, or surface operational data — making it impossible to detect problems before they escalated across branches and business units.</p>
+        <div class="challenge-risk"><p>Risk: operational blind spots would become irrecoverable at B2B scale, threatening the viability of the new growth segment.</p></div>
+      </div>
+      <div class="challenge-card">
+        <p class="challenge-tag">Academic Governance Risk</p>
+        <h3 class="challenge-title">Teaching Commitments with No Verification Layer</h3>
+        <p class="challenge-body">No system tracked whether classroom delivery aligned with syllabi, teaching plans, or contractual obligations. For B2B school partnerships — where academic standards are a formal commitment — this absence created measurable reputational and commercial risk.</p>
+        <div class="challenge-risk"><p>Risk: quality degradation would go undetected until it damaged client relationships and contract renewals.</p></div>
+      </div>
+      <div class="challenge-card">
+        <p class="challenge-tag">Resource Allocation Risk</p>
+        <h3 class="challenge-title">Workforce Visibility at Near-Zero</h3>
+        <p class="challenge-body">Teaching hours, coverage patterns, and staff utilization were not tracked. The organization had no basis for informed staffing decisions — creating both emergency recruitment gaps and invisible overstaffing that inflated costs without detection.</p>
+        <div class="challenge-risk"><p>Risk: inefficient resource deployment with no corrective signal until a crisis occurred.</p></div>
+      </div>
+      <div class="challenge-card">
+        <p class="challenge-tag">Financial Control Risk</p>
+        <h3 class="challenge-title">Payroll Built on Manual Estimation</h3>
+        <p class="challenge-body">Without verified hour logs, payroll was calculated manually — prone to error, slow to process, and nearly impossible to audit when disputes arose. Branch-level cost analysis was not feasible, limiting leadership's ability to forecast or control the organization's largest expense.</p>
+        <div class="challenge-risk"><p>Risk: unresolvable disputes, eroding staff trust, and uncontrolled payroll liability at scale.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MY ROLE -->
+<section class="snap-section role-section" id="role">
+  <div class="sec-inner">
+    <div class="section-header reveal">
+      <span class="section-number">02</span>
+      <h2 class="section-title">My Role &amp; <em>Ownership</em></h2>
+    </div>
+    <div class="role-intro-block reveal">
+      <div class="role-intro-text">
+        <p>One person. End-to-end. From problem diagnosis to production deployment.<br>No dedicated team, no technical mentor, no internal precedent — full system lifecycle ownership, beginning from zero familiarity with Google Workspace development and without any formal background in technology, systems design, or finance.</p>
+      </div>
+    </div>
+    <div class="resp-grid">
+      <div class="responsibility reveal">
+        <div class="resp-meta"><span class="resp-num">01</span> / Diagnosis</div>
+        <div class="resp-content"><h4>Problem Mapping</h4><p>Conducted structured discovery across all operational functions to identify interconnected failure points — not just surface symptoms — and translated operational pain into solvable system requirements.</p></div>
+      </div>
+      <div class="responsibility reveal d1">
+        <div class="resp-meta"><span class="resp-num">02</span> / Design</div>
+        <div class="resp-content"><h4>Solution Architecture</h4><p>Evaluated feasible approaches under a zero-budget constraint. Designed a three-layer system architecture that reused existing Google Workspace access while introducing structured data flows and automation.</p></div>
+      </div>
+      <div class="responsibility reveal d2">
+        <div class="resp-meta"><span class="resp-num">03</span> / Build</div>
+        <div class="resp-content"><h4>Tool Development</h4><p>Built all templates, automated scripts (Google Apps Script), reporting pipelines, and payroll automation tooling. No external developer involved.</p></div>
+      </div>
+      <div class="responsibility reveal">
+        <div class="resp-meta"><span class="resp-num">04</span> / Deploy</div>
+        <div class="resp-content"><h4>Phased Rollout</h4><p>Piloted across 3 B2C branches to validate and refine, then expanded to all 11 locations — managing change resistance from teaching staff throughout the transition.</p></div>
+      </div>
+      <div class="responsibility reveal d1">
+        <div class="resp-meta"><span class="resp-num">05</span> / Enable</div>
+        <div class="resp-content"><h4>Training &amp; Documentation</h4><p>Authored full user documentation and produced hands-on video tutorials to ensure adoption and reduce dependency on myself for ongoing operations.</p></div>
+      </div>
+      <div class="responsibility reveal d2">
+        <div class="resp-meta"><span class="resp-num">06</span> / Sustain</div>
+        <div class="resp-content"><h4>Maintenance &amp; Iteration</h4><p>Monitored system performance post-launch and incorporated user feedback. Maintained all tooling and resolved operational issues as the system matured.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="snap-section solution-section" id="solution">
+  <div class="sec-inner">
+    <div class="section-header reveal">
+      <span class="section-number">03</span>
+      <h2 class="section-title">Solution <em>Architecture</em></h2>
+    </div>
+    <p class="system-lead reveal">Built entirely within Google Workspace — treating Google Sheets not as a spreadsheet tool but as a structured data collection and aggregation layer. <br>The architecture establishes three distinct governance layers, each with its own scope, responsible party, and data output.</p>
+    <div class="arch-diagram-wrap reveal">
+        
+        <div class="sys-slide">
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/qR95hmu.png" alt="Three-layer architecture" class="arch-diagram-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="arch-diagram-fallback">
+                <span class="arch-fallback-label">Architecture Diagram</span>
+                <span class="arch-fallback-sub">Place <code>Payroll_architecture_diagram.png</code> in the same folder</span>
+              </div>
+            </div>
+            
+            <div class="arch-meta">
+              <div class="arch-diagram-caption"><em>Academic Governance</em></div>
+              <p class="arch-legend-item-b"> Lesson-level tracking against syllabi alongside student engagement. Each file serves as both the source of truth and the operational input.</p>
+              <div class="arch-diagram-caption"><em>Branch Operations</em></div>
+              <p class="arch-legend-item-b"> Each branch has a consolidated report file that automatically pulls and aggregates data, providing leadership an operational overview.</p>
+              <div class="arch-diagram-caption"><em>Financial Automation</em></div>
+              <p class="arch-legend-item-a"> Automated payroll derived from actual teaching records across branches. Payslips distributed before pay date to allow timely review and discrepancy reporting.</p>
+            </div>
+            
+        </div>
+        
+    </div>
+  </div>
+</section>
+
+<!-- THE SYSTEM -->
+<section class="snap-section system-section" id="system">
+  <div class="sec-inner">
+    <div class="section-header reveal">
+      <span class="section-number">04</span>
+      <h2 class="section-title">The <em>System</em></h2>
+    </div>
+    <p class="system-lead reveal">Google Sheets as the data backbone, Apps Script as the automation layer, Google Drive as the delivery mechanism. <br>Each module is a functional component of the integrated infrastructure.</p>
+
+    <div class="sys-slider reveal">
+      <div class="sys-track-wrap">
+        <div class="sys-track" id="sysTrack">
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">01 / Data Layer</span>
+              <div class="sys-slide-title">Data Model</div>
+              <p class="sys-slide-desc">A Galaxy Schema separating session-level and student-level data into distinct Fact tables with four supporting Dimension tables — normalizing pivot-format input sheets into a relational structure for analysis and reporting.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/quKFiQt.png" alt="Data Model" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Payroll_data_model.png</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">02 / Input Layer</span>
+              <div class="sys-slide-title">Input Sheets UI</div>
+              <p class="sys-slide-desc">The Google Sheets input interface is a pivot-format entry form optimized for minimal friction during data entry, while maintaining structure for downstream aggregation and reporting.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/qT64lY7.png" alt="Input Sheets UI" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+                <span>Input_sheets_ui.png</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">03 / Aggregation Layer</span>
+              <div class="sys-slide-title">Formula Logic</div>
+              <p class="sys-slide-desc">The Google Sheets formulas automatically aggregate session data from class input files into branch-level reports — handling cross-file references, conditional attendance logic, hour calculation per staff without manual steps.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/quKHBvS.png" alt="Formula Logic" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M9 9l-6 6 6 6M15 3l-6 18"/></svg>
+                <span>Formula_logic.png</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">04 / Automation Layer</span>
+              <div class="sys-slide-title">Apps Script Automation</div>
+              <p class="sys-slide-desc">The code, combined with spreadsheet formulas, triggers payslip generation, compiles individual salary statements from verified session records, and sends emails to staff before payday — removing manual distribution.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/quKJ4sa.png" alt="Apps Script Automation" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                <span>Apps_script_automation.png</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">05 / Output Layer</span>
+              <div class="sys-slide-title">Payslip — Staff View</div>
+              <p class="sys-slide-desc">Individual payslip auto-generated and emailed before payday — a session-level breakdown of date, duration, rate, and total gives every staff full transparency and a basis for proactive dispute resolution.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/quFpSMx.png" alt="Payslip Staff View" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>Payslip_staff_view.png</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">06 / Reporting Layer</span>
+              <div class="sys-slide-title">Payroll Summary</div>
+              <p class="sys-slide-desc">The consolidated matrix showing total salary costs by staff and branch over any selected time range — enabling leadership to analyse costs per branch and per business line, a capability they did not previously have.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/quFmJ0N.png" alt="Payroll Summary" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Payroll_summary.png</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sys-slide">
+            <div class="sys-slide-meta">
+              <span class="sys-slide-label">07 / Documentation</span>
+              <div class="sys-slide-title">System Usage Guide</div>
+              <p class="sys-slide-desc">Step-by-step user guide covering daily workflows and escalation procedures — with tutorials to ensure consistent adoption across branches and reduce dependency on the system designer.</p>
+            </div>
+            <div class="sys-slide-visual">
+              <img src="https://iili.io/quf3kyQ.png" alt="System Usage Guide" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="sys-placeholder" style="display:none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                <span>System_usage_guide.png</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="sys-controls">
+        <div class="sys-dots" id="sysDots"></div>
+        <div class="sys-nav">
+          <span class="sys-counter" id="sysCounter">1 / 7</span>
+          <button class="sys-btn" id="sysPrev" aria-label="Previous">&#8592;</button>
+          <button class="sys-btn" id="sysNext" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="snap-section results-section" id="results">
+  <div class="sec-inner">
+    <div class="section-header reveal">
+      <span class="section-number">05</span>
+      <h2 class="section-title">Business Value <em>Delivered</em></h2>
+    </div>
+    <p class="results-lead reveal">Beyond solving immediate pain points, the system laid the data maturity for scalable operations — where clarity grows with the business. <br> ➔ <i><b>Strategic Foundation: </b>Leadership gained a level of visibility they had never had, while staff benefited from long-awaited transparency.</i></p>
+    <div class="results-grid">
+      <div class="result-card op reveal">
+        <p class="result-cat">✔ Operational Intelligence</p>
+        <h3 class="result-title">From Reactive to Real-Time Oversight</h3>
+        <p class="result-body">Leadership moved from reactive problem-solving to structured monitoring. Branch-level reports surfaced operational issues — session gaps, low attendance, unplanned cancellations — before they escalated into larger failures.</p>
+      </div>
+      <div class="result-card ac reveal d1">
+        <p class="result-cat">✔ Academic Accountability</p>
+        <h3 class="result-title">Teaching Verification Across Every Session</h3>
+        <p class="result-body">Per-session topic logs and attendance records created the organization's first audit trail for syllabus adherence. For B2B clients, per-student data enabled structured progress reporting — strengthening contract agreement and customer satisfaction.</p>
+      </div>
+      <div class="result-card wo reveal d2">
+        <p class="result-cat">✔ Workforce Management</p>
+        <h3 class="result-title">Toward Proactive Resource Planning</h3>
+        <p class="result-body">As teaching-hour data was consolidated across branches, staff utilization became visible for the first time. This transparency reduced the risk of sudden shortages and enabling better workforce forecasting.</p>
+      </div>
+      <div class="result-card fi reveal d3">
+        <p class="result-cat">✔ Financial Transparency</p>
+        <h3 class="result-title">Payroll Automated. Disputes Traceable.</h3>
+        <p class="result-body">Payroll evolved from manual estimation to automated calculation based on verified session records. Early payslip issuance enabled advance review, while disputes dropped sharply as every session was fully traceable.</p>
+      </div>
+    </div>
+    <div class="cta-box reveal">
+      <div>
+        <h3 class="cta-headline">Let's Work <em>Together</em></h3>
+        <p class="cta-sub">I'd be glad to explore how I can support your team.</p>
+      </div>
+      <a href="https://mail.google.com/mail/u/0/?fs=1&to=hahp.working@gmail.com&su=%5BPortfolio%5D+Education+Workflow&body=Hi+Ha,%0A%0AI+came+across+your+portfolio+and+would+love+to+explore+how+we+might+work+together.%0AWhen+would+you+be+available+for+a+quick+chat?%0A%0ABest+regards,&tf=cm" class="cta-btn">Get in touch &#8594;</a>
+    </div>
+  </div>
+  <footer>
+    <p class="footer-text">Finance in Education &nbsp;&middot;&nbsp; Project 2024 &nbsp;&middot;&nbsp; B2C & B2C operations</p>
+  </footer>
+</section>
+
+<script>
+  /* ─────────────────────────────────────────────
+     REVEAL — safe for file:// and all environments
+
+     Content starts VISIBLE (opacity:1 in CSS).
+     After page is ready, we add .anim-ready to body
+     which re-enables the transition. Then we use
+     IntersectionObserver to fade elements in as they
+     enter view. Fallback: reveal all after 600ms.
+  ───────────────────────────────────────────── */
+  function revealAll() {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+  }
+
+  function initReveal() {
+    document.body.classList.add('anim-ready');
+
+    if (!('IntersectionObserver' in window)) { revealAll(); return; }
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.04 });
+
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // Fallback: if elements still hidden after 600ms, reveal everything
+    setTimeout(() => {
+      const still = document.querySelectorAll('.reveal:not(.visible)');
+      if (still.length) revealAll();
+    }, 600);
+  }
+
+  // Wait for fonts + layout before enabling animations
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(initReveal);
+  } else {
+    window.addEventListener('load', initReveal);
+  }
+  // Hard fallback: always reveal within 1s regardless
+  setTimeout(revealAll, 1000);
+
+  /* ── Progress bar ── */
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    document.getElementById('progress').style.width =
+      (d.scrollTop / (d.scrollHeight - d.clientHeight) * 100) + '%';
+  });
+
+  /* ── Wheel snap between sections ── */
+  const SECTIONS = ['hero', 'challenges', 'role', 'solution', 'system', 'results'];
+  let snapping = false;
+
+  function getNearestSection() {
+    const mid = window.scrollY + window.innerHeight * 0.5;
+    let best = 0, bestDist = Infinity;
+    SECTIONS.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const c = el.getBoundingClientRect().top + window.scrollY + el.offsetHeight * 0.5;
+      const dist = Math.abs(c - mid);
+      if (dist < bestDist) { bestDist = dist; best = i; }
+    });
+    return best;
+  }
+
+  window.addEventListener('wheel', (e) => {
+    if (snapping) { e.preventDefault(); return; }
+    const dir = e.deltaY > 0 ? 1 : -1;
+    const cur = getNearestSection();
+    const nxt = Math.max(0, Math.min(SECTIONS.length - 1, cur + dir));
+    if (nxt === cur) return;
+    e.preventDefault();
+    snapping = true;
+    document.getElementById(SECTIONS[nxt]).scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => { snapping = false; }, 950);
+  }, { passive: false });
+
+  /* ── Nav clicks (all anchors including nav-logo) ── */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const id = link.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if (!target) return;
+      e.preventDefault();
+      snapping = true;
+      target.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => { snapping = false; }, 950);
+    });
+  });
+
+  /* ── Active nav highlight ── */
+  const navAs = document.querySelectorAll('.nav-links a');
+  const secObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio >= 0.4) {
+        navAs.forEach(a => a.classList.remove('active'));
+        const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+  SECTIONS.forEach(id => { const el = document.getElementById(id); if (el) secObs.observe(el); });
+
+  /* ── System Slider ── */
+  const track   = document.getElementById('sysTrack');
+  const dotsEl  = document.getElementById('sysDots');
+  const btnPrev = document.getElementById('sysPrev');
+  const btnNext = document.getElementById('sysNext');
+  const counter = document.getElementById('sysCounter');
+  const slides  = track ? [...track.querySelectorAll('.sys-slide')] : [];
+  const total   = slides.length;
+  let cur = 0;
+
+  if (total > 0) {
+    slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'sys-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', 'Slide ' + (i + 1));
+      d.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(d);
+    });
+
+    function updateSlider() {
+      track.style.transform = `translateX(-${cur * 100}%)`;
+      dotsEl.querySelectorAll('.sys-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+      counter.textContent = (cur + 1) + ' / ' + total;
+      btnPrev.disabled = cur === 0;
+      btnNext.disabled = cur === total - 1;
+    }
+
+    function goTo(n) { cur = Math.max(0, Math.min(n, total - 1)); updateSlider(); }
+
+    btnPrev.addEventListener('click', () => goTo(cur - 1));
+    btnNext.addEventListener('click', () => goTo(cur + 1));
+
+    document.addEventListener('keydown', e => {
+      const sys = document.getElementById('system');
+      if (!sys) return;
+      const r = sys.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) {
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(cur - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); goTo(cur + 1); }
+      }
+    });
+
+    let tx = 0;
+    track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - tx;
+      if (Math.abs(dx) > 44) goTo(dx < 0 ? cur + 1 : cur - 1);
+    });
+
+    updateSlider();
+  }
+</script>
+</body>
+</html>
