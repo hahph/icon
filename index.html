@@ -96,9 +96,7 @@
 
   /* ─────────────────────────────────────────────
      SNAP BASE — desktop first.
-     height:100vh + overflow:hidden is the default.
-     Mobile (@media max-width:860px) overrides to
-     height:auto so sections scroll naturally.
+     height:100vh + overflow:hidden is the default; Mobile (@media max-width:860px) overrides to height:auto so sections scroll naturally.
   ───────────────────────────────────────────── */
   .snap-section {
     scroll-snap-align: start;
@@ -210,7 +208,7 @@
   .role-intro-text { flex: 1 1 100%; }
   .role-intro-text p { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.6; }
   /* flex:1 so the grid fills the remaining height between intro and the section edge */
-  .resp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); grid-auto-rows: minmax(0,1fr); min-height: 0; flex: 1; }
+  .resp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); grid-auto-rows: minmax(225px,auto); min-height: 0; }
   .responsibility { background: var(--paper); padding: 1.3rem 1.5rem; display: flex; flex-direction: column; transition: background 0.2s; }
   .responsibility:hover { background: #fff; }
   .resp-meta {
@@ -225,15 +223,14 @@
 
   /* ─────────────────────────────────────────────
      SOLUTION / ARCHITECTURE
-     Problem 3 fix: arch-meta is now a right-side
-     panel with 3 equal pillar rows and flow arrows.
+     arch-meta is now a right-side panel with 3 equal pillar rows and flow arrows.
   ───────────────────────────────────────────── */
   .solution-section { background: var(--paper); }
   .system-lead { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.72; padding: 0.9rem 0; flex-shrink: 0; }
 
   .arch-diagram-wrap {
     border: 1px solid var(--rule); background: #fff; overflow: hidden;
-    flex: 1; min-height: 0;
+    flex: 1; min-height: 0; max-height: 530px;
     display: flex; flex-direction: row; /* image left | pillar panel right */
   }
 
@@ -259,7 +256,7 @@
 
   /* Pillar panel — right side */
   .arch-meta {
-    width: 280px; flex-shrink: 0;
+    width: 265px; flex-shrink: 0;
     border-left: 1px solid var(--rule);
     background: var(--paper-warm);
     display: flex; flex-direction: column;
@@ -268,8 +265,8 @@
   /* Each pillar takes equal height */
   .arch-pillar {
     flex: 1;
-    padding: 1rem 1.3rem 1rem 1.5rem;
-    display: flex; flex-direction: column; justify-content: center; gap: 0.35rem;
+    padding: 1rem 2rem 1rem 2rem;
+    display: flex; flex-direction: column; justify-content: center; gap: 0.9rem;
     border-bottom: 1px solid var(--rule);
     position: relative;
   }
@@ -279,8 +276,8 @@
   .arch-pillar::before {
     content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
   }
-  .arch-pillar:nth-child(odd)::before  { background: var(--teal); }
-  .arch-pillar:nth-child(even)::before { background: var(--gold); }
+  .arch-pillar:nth-child(odd)::before  { background: var(--gold); }
+  .arch-pillar:nth-child(even)::before { background: var(--teal); }
   .arch-pillar:last-child::before      { background: var(--accent); }
 
   /* Down-arrow badge between pillars */
@@ -296,9 +293,9 @@
 
   .arch-pillar-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem; font-weight: 600; color: var(--ink); line-height: 1.2;
+    font-size: 1.3rem; font-weight: 600; color: var(--ink); line-height: 1.2;
   }
-  .arch-pillar-body { font-size: 0.71rem; color: var(--ink-soft); line-height: 1.5; }
+  .arch-pillar-body { font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5; }
 
   /* ── THE SYSTEM ── */
   .system-section { background: var(--paper-warm); }
@@ -339,8 +336,8 @@
   }
   /* Controls: space-between instead of fixed gap */
   .sys-controls {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.35rem 1.4rem; background: var(--ink); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: flex-start; gap: 460px;
+    padding: 0.35rem 6rem; background: var(--ink); flex-shrink: 0;
   }
   .sys-dots { display: flex; gap: 5px; align-items: center; }
   .sys-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.18); border: none; cursor: pointer; padding: 0; transition: all 0.25s; }
@@ -587,7 +584,7 @@
       <span class="section-number">01</span>
       <h2 class="section-title">Business <em>Challenges</em></h2>
     </div>
-    <p class="challenges-lead reveal">A decade of organic growth had outpaced the organization's internal governance capacity. As the B2B segment scaled alongside existing B2C branches, four structural risks converged — each compounding the others in ways leadership could no longer resolve reactively.</p>
+    <p class="challenges-lead reveal">A decade of organic growth had outpaced the organization's internal governance capacity. As the B2B segment scaled alongside existing B2C branches, <br>four structural risks converged — each compounding the others in ways leadership could no longer resolve reactively.</p>
     <div class="challenge-grid reveal">
       <div class="challenge-card">
         <p class="challenge-tag">Scalability Risk</p>
@@ -666,7 +663,7 @@
       <span class="section-number">03</span>
       <h2 class="section-title">Conceptual <em>Architecture</em></h2>
     </div>
-    <p class="system-lead reveal">The core design principle — <i>build on what is already familiar and available</i> — transforming Google Sheets from a simple spreadsheet tool into a structured operations platform anchored by three governance pillars.</p>
+    <p class="system-lead reveal">The core design principle — <i>build on what is already familiar and available</i> <br>Transforming Google Sheets from a simple spreadsheet tool into a structured operations platform anchored by three governance pillars.</p>
 
     <div class="arch-diagram-wrap reveal">
 
@@ -711,7 +708,7 @@
       <span class="section-number">04</span>
       <h2 class="section-title">The <em>System</em></h2>
     </div>
-    <p class="system-lead reveal">A walkthrough of the system modules — illustrating how structured inputs flow through automated processing. Together they form the reliable backbone supporting payroll control and management visibility.</p>
+    <p class="system-lead reveal">A walkthrough of the system modules — illustrating how structured inputs flow through automated processing. <br>Together they form the reliable backbone supporting payroll control and management visibility.</p>
 
     <div class="sys-slider reveal">
       <div class="sys-track-wrap">
@@ -890,9 +887,7 @@
   });
 
   /* ── Wheel snap ──
-     CSS (scroll-snap-type) handles snap on desktop.
-     CSS media query (max-width:860px) disables snap on mobile.
-     JS only handles the smooth section-jump on wheel event.    */
+     CSS (scroll-snap-type) handles snap on desktop; CSS media query (max-width:860px) disables snap on mobile; JS only handles the smooth section-jump on wheel event.    */
   const SECTIONS = ['hero', 'challenges', 'role', 'solution', 'system', 'results'];
   let snapping = false;
 
