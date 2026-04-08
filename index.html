@@ -23,6 +23,7 @@
     --gold: #bb9600;
     --blue: #1a4a8a;
     --purple: #94215f;
+    --frk: #bc3c1a;
     --nav-h: 54px;
   }
 
@@ -175,7 +176,7 @@
     display: flex; align-items: center; gap: 0.6rem;
   }
   .tags-eyebrow::before { content: ''; width: 1.5rem; height: 1px; background: var(--ink-muted); flex-shrink: 0; }
-  .tag-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center }
   .tag { font-family: 'DM Mono', monospace; font-size: 0.57rem; letter-spacing: 0.09em; text-transform: uppercase; padding: 0.32rem 0.75rem; white-space: nowrap; }
   .tag-dark   { background: var(--ink); color: var(--paper); }
   .tag-accent { background: var(--accent); color: #fff; }
@@ -188,6 +189,7 @@
   .challenges-section .section-number { color: #555; border-color: #2e2e2e; }
   .challenges-section .section-header { border-color: #222; }
   .challenges-lead { font-size: 0.81rem; color: var(--ink-muted); line-height: 1.7; padding: 2rem 0; flex-shrink: 0; }
+  .challenges-lead en { color: var(--frk); }
   .challenge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1e1e1e; }
   .challenge-card { background: #111; padding: 1.5rem 1.7rem; display: flex; flex-direction: column; transition: background 0.3s; }
   .challenge-card:hover { background: #161616; }
@@ -207,6 +209,7 @@
   .role-intro-block { display: flex; align-items: center; gap: 2.5rem; padding: 2rem 0; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
   .role-intro-text { flex: 1 1 100%; }
   .role-intro-text p { font-size: 0.78rem; color: var(--ink-soft); line-height: 1.6; }
+  .role-intro-text en { color: var(--frk); }
   /* flex:1 so the grid fills the remaining height between intro and the section edge */
   .resp-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); grid-auto-rows: minmax(225px,auto); min-height: 0; }
   .responsibility { background: var(--paper); padding: 1.3rem 1.5rem; display: flex; flex-direction: column; transition: background 0.2s; }
@@ -227,6 +230,7 @@
   ───────────────────────────────────────────── */
   .solution-section { background: var(--paper); }
   .system-lead { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.72; padding: 0.9rem 0; flex-shrink: 0; }
+  .system-lead en { color: var(--frk); }
 
   .arch-diagram-wrap {
     border: 1px solid var(--rule); background: #fff; overflow: hidden;
@@ -360,6 +364,7 @@
   ───────────────────────────────────────────── */
   .results-section { background: var(--paper); }
   .results-lead { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.75; padding: 0.9rem 0; max-width: 97ch; flex-shrink: 0; }
+  .results-lead en { color: var(--frk); }
   .results-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
     background: var(--rule); border: 1px solid var(--rule);
@@ -584,7 +589,7 @@
       <span class="section-number">01</span>
       <h2 class="section-title">Business <em>Challenges</em></h2>
     </div>
-    <p class="challenges-lead reveal">A decade of organic growth had outpaced the organization's internal governance capacity. As the B2B segment scaled alongside existing B2C branches, <br>four structural risks converged — each compounding the others in ways leadership could no longer resolve reactively.</p>
+    <p class="challenges-lead reveal">A decade of organic growth had outpaced <en>the organization's internal governance capacity</en>. As the B2B segment scaled alongside existing B2C branches, <br>four structural risks converged — each compounding the others in ways <en>leadership could no longer resolve reactively</en>.</p>
     <div class="challenge-grid reveal">
       <div class="challenge-card">
         <p class="challenge-tag">Scalability Risk</p>
@@ -623,8 +628,8 @@
     </div>
     <div class="role-intro-block reveal">
       <div class="role-intro-text">
-        <p>No dedicated team. No technical mentor. No internal precedent.<br>
-           Every decision — from identifying the problems to maintaining the system post-launch — was researched, reasoned, and executed independently.</p>
+        <p><en>No dedicated team. No technical mentor. No internal precedent.</en><br>
+           Every decision — from identifying the problems to maintaining the system post-launch — was <en>researched, reasoned, and executed independently</en>.</p>
       </div>
     </div>
     <div class="resp-grid">
@@ -663,7 +668,7 @@
       <span class="section-number">03</span>
       <h2 class="section-title">Conceptual <em>Architecture</em></h2>
     </div>
-    <p class="system-lead reveal">The core design principle — <i>build on what is already familiar and available</i> <br>Transforming Google Sheets from a simple spreadsheet tool into a structured operations platform anchored by three governance pillars.</p>
+    <p class="system-lead reveal">The core design principle — <en>build on what is already familiar and available</en> <br>Transforming Google Sheets from a simple spreadsheet tool into a structured operations platform anchored by <en>three governance pillars</en>.</p>
 
     <div class="arch-diagram-wrap reveal">
 
@@ -708,7 +713,7 @@
       <span class="section-number">04</span>
       <h2 class="section-title">The <em>System</em></h2>
     </div>
-    <p class="system-lead reveal">A walkthrough of the system modules — illustrating how structured inputs flow through automated processing. <br>Together they form the reliable backbone supporting payroll control and management visibility.</p>
+    <p class="system-lead reveal">A walkthrough of the system modules — illustrating how <en>structured inputs flow through automated processing</en>. <br>Together they form <en>the reliable backbone</en> supporting payroll control and management visibility.</p>
 
     <div class="sys-slider reveal">
       <div class="sys-track-wrap">
@@ -813,7 +818,7 @@
       <span class="section-number">05</span>
       <h2 class="section-title">Business Value <em>Delivered</em></h2>
     </div>
-    <p class="results-lead reveal">Beyond solving immediate pain points, the system laid the foundation for scalable operations — bringing consistent visibility for leadership and transparent payroll verification for staff.</p>
+    <p class="results-lead reveal">Beyond solving immediate pain points, the system laid the foundation for scalable operations — bringing <en>consistent visibility for leadership</en> and <en>transparent payroll verification for staff</en>.</p>
     <div class="results-grid">
       <div class="result-card op reveal">
         <p class="result-cat">✔ Operational Intelligence</p>
