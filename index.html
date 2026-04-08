@@ -544,7 +544,7 @@
 <!-- NAV -->
 <nav>
   <div class="nav-left">
-    <a href="#" class="nav-back" onclick="handleBackToPortfolio(event)">  <span class="nav-back-arrow">&#8678;</span> Portfolio</a>
+    <a href="#" class="nav-back"><span class="nav-back-arrow">&#8678;</span> Portfolio</a>
     <a href="#hero" class="nav-logo" id="navLogo">Case Study — FinEdu System</a>
   </div>
   <ul class="nav-links">
@@ -628,8 +628,7 @@
     </div>
     <div class="role-intro-block reveal">
       <div class="role-intro-text">
-        <p><en>No dedicated team. No technical mentor. No internal precedent.</en><br>
-           Every decision — from identifying the problems to maintaining the system post-launch — was <en>researched, reasoned, and executed independently</en>.</p>
+        <p>My role extended across the <en>full system lifecycle</en> — from identifying structural gaps and shaping system logic to post-launch maintenance.<br> The work required independent research, judgment, and continuous iteration <en>across both operational and technical decisions</en>.</p>
       </div>
     </div>
     <div class="resp-grid">
@@ -998,29 +997,6 @@
     });
 
     updateSlider();
-  }
-</script>
-
- <script>
-  function handleBackToPortfolio(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    console.log("Back button clicked");
-
-    const isEmbedded = window.parent && window.parent !== window;
-
-    if (isEmbedded) {
-      console.log("Sending CLOSE_CASE_STUDY message to parent");
-      window.parent.postMessage({ type: "CLOSE_CASE_STUDY" }, "*");
-    } else {
-      console.log("Standalone mode");
-      if (document.referrer) {
-        window.history.back();
-      } else {
-        window.location.href = "/";
-      }
-    }
   }
 </script>
 </body>
